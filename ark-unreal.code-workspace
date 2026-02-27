@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../glyd"
+		},
+		{
+			"path": "../UNREAL/dev_dispatch"
+		}
+	],
+	"settings": {}
+}

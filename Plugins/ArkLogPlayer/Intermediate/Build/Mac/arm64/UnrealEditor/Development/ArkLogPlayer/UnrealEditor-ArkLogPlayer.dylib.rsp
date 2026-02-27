@@ -1,0 +1,35 @@
+-L/usr/lib/swift
+-arch arm64
+-isysroot "/Applications/Xcode-16.4.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+-target arm64-apple-macos14.00
+-dead_strip
+-dynamiclib
+-headerpad_max_install_names
+-current_version 4313.93.11
+-compatibility_version 5.6.0
+-rpath @loader_path/ -rpath @executable_path/
+"/Applications/Xcode-16.4.0.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/PrivateFrameworks/MultitouchSupport.framework/Versions/Current/MultitouchSupport.tbd"
+"../Binaries/Mac/UnrealEditor-Core.dylib"
+-rpath "@loader_path/../../../../../../../../Shared/Epic Games/UE_5.6/Engine/Binaries/Mac"
+"../Binaries/Mac/UnrealEditor-CoreUObject.dylib"
+"../Binaries/Mac/UnrealEditor-Engine.dylib"
+"../Binaries/Mac/UnrealEditor-Json.dylib"
+"../Binaries/Mac/UnrealEditor-JsonUtilities.dylib"
+-framework "Cocoa"
+-framework "Carbon"
+-framework "IOKit"
+-framework "Security"
+-framework "UniformTypeIdentifiers"
+-framework "Network"
+-framework "ScreenCaptureKit"
+-framework "SystemConfiguration"
+-framework "AVFoundation"
+-framework "CoreVideo"
+-framework "CoreMedia"
+-install_name "@rpath/UnrealEditor-ArkLogPlayer.dylib"
+"/Users/markmanfrey/LOCAL_DEV/UNREAL/dev_dispatch/Plugins/ArkLogPlayer/Intermediate/Build/Mac/arm64/UnrealEditor/Development/ArkLogPlayer/Module.ArkLogPlayer.cpp.o"
+"/Users/markmanfrey/LOCAL_DEV/UNREAL/dev_dispatch/Plugins/ArkLogPlayer/Intermediate/Build/Mac/arm64/UnrealEditor/Development/ArkLogPlayer/ArkVehicleDriveComponent.cpp.o"
+"/Users/markmanfrey/LOCAL_DEV/UNREAL/dev_dispatch/Plugins/ArkLogPlayer/Intermediate/Build/Mac/arm64/UnrealEditor/Development/ArkLogPlayer/ArkLogPlayerModule.cpp.o"
+"/Users/markmanfrey/LOCAL_DEV/UNREAL/dev_dispatch/Plugins/ArkLogPlayer/Intermediate/Build/Mac/arm64/UnrealEditor/Development/ArkLogPlayer/ArkLogPlayerSubsystem.cpp.o"
+"/Users/markmanfrey/LOCAL_DEV/UNREAL/dev_dispatch/Plugins/ArkLogPlayer/Intermediate/Build/Mac/arm64/UnrealEditor/Development/ArkLogPlayer/ArkJsonParser.cpp.o"
+-o "/Users/markmanfrey/LOCAL_DEV/UNREAL/dev_dispatch/Plugins/ArkLogPlayer/Binaries/Mac/UnrealEditor-ArkLogPlayer.dylib"

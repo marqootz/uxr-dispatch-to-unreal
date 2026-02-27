@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+
+# Unreal Engine generated files (project-wide)
+Binaries/
+Intermediate/
+DerivedDataCache/
+Saved/
+.vs/
+
+# Plugin generated files
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+
+# Optional IDE artifacts
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb

@@ -5,6 +5,8 @@
 #include "ArkJsonParser.h"
 #include "ArkTypes.h"
 #include "Components/SplineComponent.h"
+#include "Components/SplineMeshComponent.h"
+#include "Engine/CollisionProfile.h"
 
 AArkPathPreviewActor::AArkPathPreviewActor()
 {
@@ -13,7 +15,7 @@ AArkPathPreviewActor::AArkPathPreviewActor()
 	PathSpline = CreateDefaultSubobject<USplineComponent>(TEXT("PathSpline"));
 	SetRootComponent(PathSpline);
 	PathSpline->SetMobility(EComponentMobility::Movable);
-	PathSpline->bDrawDebug = true;
+	PathSpline->bDrawDebug = bShowSplineDebug;
 }
 
 void AArkPathPreviewActor::OnConstruction(const FTransform& Transform)
@@ -33,6 +35,8 @@ void AArkPathPreviewActor::RebuildPreview()
 		return;
 	}
 
+	PathSpline->bDrawDebug = bShowSplineDebug;
+
 	TArray<FVector> Points;
 	FString Error;
 	if (!BuildPoints(Points, Error))
@@ -49,6 +53,7 @@ void AArkPathPreviewActor::RebuildPreview()
 		if (bClearOnFailure)
 		{
 			PathSpline->ClearSplinePoints(true);
+			ClearRoadMeshes();
 		}
 		return;
 	}
@@ -59,6 +64,7 @@ void AArkPathPreviewActor::RebuildPreview()
 		PathSpline->AddSplinePoint(P, ESplineCoordinateSpace::World, false);
 	}
 	PathSpline->UpdateSpline();
+	RebuildRoadMeshes();
 
 	UE_LOG(
 		LogTemp,
@@ -69,6 +75,70 @@ void AArkPathPreviewActor::RebuildPreview()
 		VehicleId,
 		*FilePath
 	);
+}
+
+void AArkPathPreviewActor::ClearRoadMeshes()
+{
+	for (USplineMeshComponent* MeshComp : RoadSplineMeshes)
+	{
+		if (IsValid(MeshComp))
+		{
+			MeshComp->DestroyComponent();
+		}
+	}
+	RoadSplineMeshes.Reset();
+}
+
+void AArkPathPreviewActor::RebuildRoadMeshes()
+{
+	ClearRoadMeshes();
+
+	if (!bGenerateRoadMesh || !PathSpline || !RoadMesh)
+	{
+		return;
+	}
+
+	const int32 NumSplinePoints = PathSpline->GetNumberOfSplinePoints();
+	if (NumSplinePoints < 2)
+	{
+		return;
+	}
+
+	for (int32 PointIndex = 0; PointIndex < NumSplinePoints - 1; ++PointIndex)
+	{
+		USplineMeshComponent* MeshComp = NewObject<USplineMeshComponent>(this);
+		if (!MeshComp)
+		{
+			continue;
+		}
+
+		MeshComp->SetMobility(EComponentMobility::Movable);
+		MeshComp->SetStaticMesh(RoadMesh);
+		MeshComp->SetForwardAxis(RoadForwardAxis, false);
+		MeshComp->SetStartScale(FVector2D(RoadWidthScale, RoadThicknessScale), false);
+		MeshComp->SetEndScale(FVector2D(RoadWidthScale, RoadThicknessScale), false);
+
+		if (RoadMaterialOverride)
+		{
+			MeshComp->SetMaterial(0, RoadMaterialOverride);
+		}
+
+		MeshComp->SetCollisionEnabled(bRoadCollision ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+		if (!bRoadCollision)
+		{
+			MeshComp->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+		}
+
+		const FVector StartPos = PathSpline->GetLocationAtSplinePoint(PointIndex, ESplineCoordinateSpace::Local);
+		const FVector StartTangent = PathSpline->GetTangentAtSplinePoint(PointIndex, ESplineCoordinateSpace::Local);
+		const FVector EndPos = PathSpline->GetLocationAtSplinePoint(PointIndex + 1, ESplineCoordinateSpace::Local);
+		const FVector EndTangent = PathSpline->GetTangentAtSplinePoint(PointIndex + 1, ESplineCoordinateSpace::Local);
+		MeshComp->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent, true);
+
+		MeshComp->AttachToComponent(PathSpline, FAttachmentTransformRules::KeepRelativeTransform);
+		MeshComp->RegisterComponent();
+		RoadSplineMeshes.Add(MeshComp);
+	}
 }
 
 bool AArkPathPreviewActor::BuildPoints(TArray<FVector>& OutPoints, FString& OutError) const

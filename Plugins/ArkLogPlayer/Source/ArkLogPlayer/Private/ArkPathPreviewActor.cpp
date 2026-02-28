@@ -171,6 +171,9 @@ bool AArkPathPreviewActor::BuildPoints(TArray<FVector>& OutPoints, FString& OutE
 		? static_cast<int64>(static_cast<double>(MinSampleStepSec) * 1e9)
 		: 0;
 	int64 LastAcceptedNs = TNumericLimits<int64>::Min();
+	const float FlattenPlaneZFromActor = GetActorLocation().Z;
+	bool bHasFlattenPlaneFromFirstPoint = false;
+	float FlattenPlaneZ = 0.0f;
 
 	for (const FArkFrame& Frame : Frames)
 	{
@@ -187,7 +190,33 @@ bool AArkPathPreviewActor::BuildPoints(TArray<FVector>& OutPoints, FString& OutE
 		{
 			if (V.VehicleId == VehicleId)
 			{
-				OutPoints.Add(V.Position + WorldOffset);
+				FVector Point = V.Position + WorldOffset;
+
+				if (bFlattenPathZ)
+				{
+					switch (FlattenZMode)
+					{
+					case EArkPathFlattenZMode::ActorZ:
+						FlattenPlaneZ = FlattenPlaneZFromActor;
+						Point.Z = FlattenPlaneZ;
+						break;
+					case EArkPathFlattenZMode::CustomZ:
+						FlattenPlaneZ = FlattenZValue;
+						Point.Z = FlattenPlaneZ;
+						break;
+					case EArkPathFlattenZMode::FirstPointZ:
+					default:
+						if (!bHasFlattenPlaneFromFirstPoint)
+						{
+							FlattenPlaneZ = Point.Z;
+							bHasFlattenPlaneFromFirstPoint = true;
+						}
+						Point.Z = FlattenPlaneZ;
+						break;
+					}
+				}
+
+				OutPoints.Add(Point);
 				LastAcceptedNs = Frame.TimestampNs;
 				if (OutPoints.Num() >= MaxPoints)
 				{

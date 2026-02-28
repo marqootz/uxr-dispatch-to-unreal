@@ -12,6 +12,17 @@ class USplineMeshComponent;
 class UStaticMesh;
 class UMaterialInterface;
 
+UENUM(BlueprintType)
+enum class EArkPathFlattenZMode : uint8
+{
+	/** Use the Z value of the first accepted path point. */
+	FirstPointZ UMETA(DisplayName = "First Point Z"),
+	/** Use this preview actor's world Z. */
+	ActorZ UMETA(DisplayName = "Actor Z"),
+	/** Use a custom absolute world-space Z value (cm). */
+	CustomZ UMETA(DisplayName = "Custom Z"),
+};
+
 /**
  * Place this actor in a level to preview a full vehicle path from a .jsonl file.
  * Rebuilds in editor when properties change (OnConstruction) and can also be
@@ -44,6 +55,18 @@ public:
 	/** Draw spline debug in viewport independently of generated road mesh. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ark Path Preview")
 	bool bShowSplineDebug = true;
+
+	/** Flatten all preview points to a single Z plane. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ark Path Preview")
+	bool bFlattenPathZ = false;
+
+	/** How to choose Z when flattening the path. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ark Path Preview", meta = (EditCondition = "bFlattenPathZ"))
+	EArkPathFlattenZMode FlattenZMode = EArkPathFlattenZMode::FirstPointZ;
+
+	/** Absolute world-space Z used when FlattenZMode is CustomZ. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ark Path Preview", meta = (EditCondition = "bFlattenPathZ && FlattenZMode == EArkPathFlattenZMode::CustomZ"))
+	float FlattenZValue = 0.0f;
 
 	/** Rebuild automatically when actor is constructed/edited. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ark Path Preview")

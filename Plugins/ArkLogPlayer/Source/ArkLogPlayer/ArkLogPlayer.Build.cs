@@ -14,7 +14,8 @@ public class ArkLogPlayer : ModuleRules
 			"CoreUObject",
 			"Engine",
 			"Json",
-			"JsonUtilities"
+			"JsonUtilities",
+			"ProceduralMeshComponent"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
